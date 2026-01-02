@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  npp-api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: python -m uvicorn api:app --host 0.0.0.0 --port 8000
+
+  npp-train:
+    build: .
+    volumes:
+      - ./data:/app/data
+      - ./checkpoints:/app/checkpoints
+    command: python train.py
+    environment:
+      - PYTHONUNBUFFERED=1
