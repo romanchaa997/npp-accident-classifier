@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: npp-classifier-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: npp-classifier
+  template:
+    metadata:
+      labels:
+        app: npp-classifier
+    spec:
+      containers:
+      - name: api
+        image: npp-accident-classifier:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: PYTHONUNBUFFERED
+          value: "1"
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: npp-classifier-service
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8000
+  selector:
+    app: npp-classifier
